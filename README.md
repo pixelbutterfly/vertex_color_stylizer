@@ -1,6 +1,8 @@
 # Vertex Color Stylizer
 A Blender utility addon for modifying vertex colors.
 
+![vertex_color_stylizer](https://user-images.githubusercontent.com/61604905/231075748-6be01ed6-fd19-48c9-a9f7-6872fc8b21aa.PNG)
+
 Several functions to randomize and harden your vertex color attributes.
 
 ## Add Noise (hard)
@@ -30,4 +32,5 @@ Same as 'Harden Colors' but also randomizes the colors of the faces.
 * locate the downloaded vertexColorStylizer.py file and double-click it
 * search for the addon "Vertex Color Stylizer"
 * activate the addon by ticking the checkbox (hit the Save User Settings button at the bottom if your blender is setup that way)
+
 
