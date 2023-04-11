@@ -1,9 +1,7 @@
 # Vertex Color Stylizer
-A Blender utility addon for modifying vertex colors.
+A small Blender utility addon for modifying vertex colors.
 
 ![vertex_color_stylizer](https://user-images.githubusercontent.com/61604905/231079413-b6d9f241-01f5-4173-9fba-c262547e3c22.PNG)
-
-Several functions to randomize and harden your vertex color attributes.
 
 ## Add Noise (soft)
 Randomizes color per vertex.
