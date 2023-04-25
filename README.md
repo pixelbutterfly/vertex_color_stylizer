@@ -35,8 +35,9 @@ Add, subtract, multiply, or overlay the selected color over the selected faces.
 
 
 ## Notes
-* All functions work in any viewport mode, on selected objects or (in edit mode) faces. 
-* Stylize, Harden, and Randomize Colors (hard) require face corner arrtibutes.
+* All functions work in any viewport mode, on selected objects or (in edit mode) selected faces. 
+* Stylize, Harden, and Randomize Colors (hard) require face corner attributes to work.
+* Operations work on the currently selected color attribute. If it looks like nothing's happening, check that you're rendering the right attribute.
 
 ## Installation
 * Get the latest vertexColorStylizer.py release in: https://github.com/pixelbutterfly/vertex_color_stylizer
