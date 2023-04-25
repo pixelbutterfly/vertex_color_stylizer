@@ -1,5 +1,5 @@
 # Vertex Color Stylizer
-A Blender utility addon for modifying vertex colors. For Blender 2.3 and later.
+Several functions for modifying vertex colors. For Blender 2.3 and later.
 
 ![vertex_color_stylizer_banner](https://user-images.githubusercontent.com/61604905/234193874-39b382bf-df69-4e2e-acc6-1d360e0f0be9.png)
 
