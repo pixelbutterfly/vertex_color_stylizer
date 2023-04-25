@@ -24,12 +24,15 @@ Same as 'Harden Colors' but also randomizes the colors of the faces.
 ![vertex_color_stylize](https://user-images.githubusercontent.com/61604905/234194033-3234ee7d-8f75-4b38-819c-625d73ab3873.png)
 
 ## Invert Vertex Colors
-Similar to blender's built in invert color function, but lets you mask by channel.
+Similar to Blender's "invert color" function, but lets you mask by channel and optionally inverts the alpha as well.
 
 ![vertex_color_stylizer_invert](https://user-images.githubusercontent.com/61604905/234194279-fb23a8e3-6411-4ab6-b295-edb577a2b8c5.png)
 
 ## Blend Vertex Colors
 Add, subtract, multiply, or overlay the selected color over the selected faces.
+
+![vertex_color_blend](https://user-images.githubusercontent.com/61604905/234195912-6f64820d-5912-41c4-b864-cbaeccf0676e.png)
+
 
 ## Notes
 * All functions work in any viewport mode, on selected objects or (in edit mode) faces. 
