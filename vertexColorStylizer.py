@@ -7,7 +7,7 @@ bl_info = {
 	# optional
 	'version': (1, 0, 0),
 	'author': 'pixelbutterfly.com',
-	'description': 'Modify object's vertex color.',
+	'description': 'Modify objects vertex color.',
 	'doc_url': 'https://github.com/pixelbutterfly/vertex_color_stylizer',
 }
 
@@ -671,16 +671,19 @@ class BlendVertexColors(bpy.types.Operator):
 									vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]-context.scene.tint_color[1]
 									vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]-context.scene.tint_color[2]
 								elif (context.scene.tint_mode == 'OVRL'):
-									lowerLayerValue = colorsys.rgb_to_hsv(vertex_colors.data[loop_index].color[0],vertex_colors.data[loop_index].color[1],vertex_colors.data[loop_index].color[2])
-									upperLayerValue = colorsys.rgb_to_hsv(context.scene.tint_color[0],context.scene.tint_color[1],context.scene.tint_color[2])
-									if (lowerLayerValue[2]<.5):
+									if (vertex_colors.data[loop_index].color[0]<.5):
 										vertex_colors.data[loop_index].color[0] = 2*vertex_colors.data[loop_index].color[0]* context.scene.tint_color[0]
+									else:
+										vertex_colors.data[loop_index].color[0] = 1-(2*(1-vertex_colors.data[loop_index].color[0])*(1-context.scene.tint_color[0]))
+									if (vertex_colors.data[loop_index].color[1]<.5):
 										vertex_colors.data[loop_index].color[1] = 2*vertex_colors.data[loop_index].color[1]* context.scene.tint_color[1]
+									else:
+										vertex_colors.data[loop_index].color[1] = 1-(2*(1-vertex_colors.data[loop_index].color[1])*(1-context.scene.tint_color[1]))
+									if (vertex_colors.data[loop_index].color[2]<.5):
 										vertex_colors.data[loop_index].color[2] = 2*vertex_colors.data[loop_index].color[2]* context.scene.tint_color[2]
 									else:
-										vertex_colors.data[loop_index].color[0] = 1-2*((1-vertex_colors.data[loop_index].color[0])*(1-context.scene.tint_color[0]))
-										vertex_colors.data[loop_index].color[1] = 1-2*((1-vertex_colors.data[loop_index].color[1])*(1-context.scene.tint_color[1]))
-										vertex_colors.data[loop_index].color[2] = 1-2*((1-vertex_colors.data[loop_index].color[2])*(1-context.scene.tint_color[2]))
+										vertex_colors.data[loop_index].color[2] = 1-(2*(1-vertex_colors.data[loop_index].color[2])*(1-context.scene.tint_color[2]))
+									
 					if vertex_colors.domain == 'POINT':
 						for selected_vert in selected_verts:
 							loop_index = selected_vert.index
@@ -697,16 +700,19 @@ class BlendVertexColors(bpy.types.Operator):
 								vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]-context.scene.tint_color[1]
 								vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]-context.scene.tint_color[2]
 							elif (context.scene.tint_mode == 'OVRL'):
-								lowerLayerValue = colorsys.rgb_to_hsv(vertex_colors.data[loop_index].color[0],vertex_colors.data[loop_index].color[1],vertex_colors.data[loop_index].color[2])
-								upperLayerValue = colorsys.rgb_to_hsv(context.scene.tint_color[0],context.scene.tint_color[1],context.scene.tint_color[2])
-								if (lowerLayerValue[2]<.5):
+								if (vertex_colors.data[loop_index].color[0]<.5):
 									vertex_colors.data[loop_index].color[0] = 2*vertex_colors.data[loop_index].color[0]* context.scene.tint_color[0]
+								else:
+									vertex_colors.data[loop_index].color[0] = 1-(2*(1-vertex_colors.data[loop_index].color[0])*(1-context.scene.tint_color[0]))
+								if (vertex_colors.data[loop_index].color[1]<.5):
 									vertex_colors.data[loop_index].color[1] = 2*vertex_colors.data[loop_index].color[1]* context.scene.tint_color[1]
+								else:
+									vertex_colors.data[loop_index].color[1] = 1-(2*(1-vertex_colors.data[loop_index].color[1])*(1-context.scene.tint_color[1]))
+								if (vertex_colors.data[loop_index].color[2]<.5):
 									vertex_colors.data[loop_index].color[2] = 2*vertex_colors.data[loop_index].color[2]* context.scene.tint_color[2]
 								else:
-									vertex_colors.data[loop_index].color[0] = 1-2*((1-vertex_colors.data[loop_index].color[0])*(1-context.scene.tint_color[0]))
-									vertex_colors.data[loop_index].color[1] = 1-2*((1-vertex_colors.data[loop_index].color[1])*(1-context.scene.tint_color[1]))
-									vertex_colors.data[loop_index].color[2] = 1-2*((1-vertex_colors.data[loop_index].color[2])*(1-context.scene.tint_color[2]))
+									vertex_colors.data[loop_index].color[2] = 1-(2*(1-vertex_colors.data[loop_index].color[2])*(1-context.scene.tint_color[2]))
+
 					bpy.ops.object.mode_set(mode='EDIT')
 				else:
 					bpy.context.view_layer.objects.active = object
@@ -732,18 +738,19 @@ class BlendVertexColors(bpy.types.Operator):
 								vert.color[1] = vert.color[1]-context.scene.tint_color[1]
 								vert.color[2] = vert.color[2]-context.scene.tint_color[2]
 							elif (context.scene.tint_mode == 'OVRL'):
-								lowerLayerValue = colorsys.rgb_to_hsv(vert.color[0],vert.color[1],vert.color[2])
-								upperLayerValue = colorsys.rgb_to_hsv(context.scene.tint_color[0],context.scene.tint_color[1],context.scene.tint_color[2])
-								if (lowerLayerValue[2]<.5):
+								if (vert.color[0]<.5):
 									vert.color[0] = 2*vert.color[0]* context.scene.tint_color[0]
+								else:
+									vert.color[0] = 1-(2*(1-vert.color[0])*(1-context.scene.tint_color[0]))
+								if (vert.color[1]<.5):
 									vert.color[1] = 2*vert.color[1]* context.scene.tint_color[1]
+								else:
+									vert.color[1] = 1-(2*(1-vert.color[1])*(1-context.scene.tint_color[1]))
+								if (vert.color[2]<.5):
 									vert.color[2] = 2*vert.color[2]* context.scene.tint_color[2]
 								else:
-									vert.color[0] = 1-2*((1-vert.color[0])*(1-context.scene.tint_color[0]))
-									vert.color[1] = 1-2*((1-vert.color[1])*(1-context.scene.tint_color[1]))
-									vert.color[2] = 1-2*((1-vert.color[2])*(1-context.scene.tint_color[2]))
-									
-									
+									vert.color[2] = 1-(2*(1-vert.color[2])*(1-context.scene.tint_color[2]))
+
 					bpy.ops.object.mode_set ( mode = current_mode )
 					
 		return {'FINISHED'}		
