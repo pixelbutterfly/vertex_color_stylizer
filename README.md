@@ -29,7 +29,7 @@ Similar to Blender's "invert color" function, but lets you mask by channel inclu
 ![vertex_color_stylizer_invert](https://user-images.githubusercontent.com/61604905/234194279-fb23a8e3-6411-4ab6-b295-edb577a2b8c5.png)
 
 ## Blend Vertex Colors
-Add, subtract, multiply, or overlay the selected color over the selected faces.
+Add, subtract, multiply, mix, or overlay the selected color over the selected faces.
 
 ![vertex_color_blend](https://user-images.githubusercontent.com/61604905/234195912-6f64820d-5912-41c4-b864-cbaeccf0676e.png)
 
@@ -38,6 +38,7 @@ Add, subtract, multiply, or overlay the selected color over the selected faces.
 * All functions work in any viewport mode on the selected objects or (in edit mode) on the selected faces. 
 * Stylize, Harden, and Randomize Colors (hard) require face corner vertex colors to work.
 * Operations work on the currently selected color attribute. If it looks like nothing's happening, check that you're rendering the right color attribute.
+* Blend modes respect the alpha value. Use an alpha of 1 to get full intensity blend strength.
 
 ## Installation
 * Get the latest vertexColorStylizer.py release in: https://github.com/pixelbutterfly/vertex_color_stylizer
