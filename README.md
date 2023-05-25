@@ -6,33 +6,32 @@ Several functions for modifying vertex colors. For Blender 2.3 and later.
 ## Randomize Vertex Colors (soft)
 Randomizes color per vertex.
 
-![vertex_color_add_soft_noise](https://user-images.githubusercontent.com/61604905/234193903-e89caadc-70bc-475d-8a41-6e281d2fa68e.png)
+![vertex_color_add_soft_noise](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/aca37b55-dab1-45c7-888b-c31703defc0b)
 
 ## Randomize Vertex Colors (hard)
 Randomizes color per face corner.
 
-![vertex_color_add_hard_noise](https://user-images.githubusercontent.com/61604905/234194003-42364227-53e9-4b1a-9e36-42e4dd2d22ca.png)
+![vertex_color_add_hard_noise](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/22fd8573-e5c4-427a-be99-e85596338975)
 
 ## Harden Vertex Colors
 Averages out the vertex colors per face, giving a faceted look to your colors.
 
-![vertex_color_harden](https://user-images.githubusercontent.com/61604905/234193962-3e2924e7-a172-4915-a649-8bc792f573a3.png)
+![vertex_color_harden](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/48b636ae-df77-4f17-ba59-b8dccaece3d6)
 
 ## Stylize Vertex Colors
 Same as 'Harden Colors' but also randomizes the colors of the faces.
 
-![vertex_color_stylize](https://user-images.githubusercontent.com/61604905/234194033-3234ee7d-8f75-4b38-819c-625d73ab3873.png)
+![vertex_color_stylize](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/6d6935e5-f925-4429-bcaf-795e072738a4)
 
 ## Invert Vertex Colors
 Similar to Blender's "invert color" function, but lets you mask by channel including the alpha channel.
 
-![vertex_color_stylizer_invert](https://user-images.githubusercontent.com/61604905/234194279-fb23a8e3-6411-4ab6-b295-edb577a2b8c5.png)
+![vertex_color_stylizer_invert](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/fdb337ef-d9b3-44d3-b8ba-9951bb567ddd)
 
 ## Blend Vertex Colors
 Add, subtract, multiply, mix, or overlay the selected color over the selected faces.
 
-![vertex_color_blend](https://user-images.githubusercontent.com/61604905/234195912-6f64820d-5912-41c4-b864-cbaeccf0676e.png)
-
+![vertex_color_blend](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/27f435da-e476-42e6-b384-42bb25cbcdd5)
 
 ## Notes
 * All functions work in any viewport mode on the selected objects or (in edit mode) on the selected faces. 
