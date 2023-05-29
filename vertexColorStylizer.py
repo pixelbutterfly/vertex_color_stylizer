@@ -5,7 +5,7 @@ bl_info = {
 	'blender': (3, 2, 0),
 	'category': 'Object',
 	# optional
-	'version': (1, 0, 0),
+	'version': (1, 0, 1),
 	'author': 'pixelbutterfly.com',
 	'description': 'Modify objects vertex color.',
 	'doc_url': 'https://github.com/pixelbutterfly/vertex_color_stylizer',
@@ -41,8 +41,8 @@ PROPS3 = [
 ]		
 														
 PROPS4 = [
-	('tint_color', bpy.props.FloatVectorProperty(name='tint color',subtype='COLOR', default=(1.0,0.0,0.0,1.0),min=0.0,max=1.0,size=4,)),
-	('tint_strength', bpy.props.FloatProperty(name='tint strength', default=.1, min=0, max=1, soft_min = 0, soft_max = 1)),
+	('tint_color', bpy.props.FloatVectorProperty(name='blend color',subtype='COLOR', default=(1.0,0.0,0.0,1.0),min=0.0,max=1.0,size=4,)),
+	('tint_strength', bpy.props.FloatProperty(name='blend strength', default=.1, min=0, max=1, soft_min = 0, soft_max = 1)),
 	('tint_mode', bpy.props.EnumProperty(
             #(identifier, name, description, icon, number)
     items = [('MUL','Multiply','','',0), 
@@ -50,7 +50,7 @@ PROPS4 = [
              ('SUB','Subtract','','',2),
              ('OVRL','Overlay','','',3),
 			 ('MIX','Mix','','',4),],
-    name = 'tint mode',
+    name = 'blend mode',
     default = 'MIX')),
 ]	
 # == OPERATORS
@@ -624,10 +624,159 @@ class InvertVertexColors(bpy.types.Operator):
 					bpy.ops.object.mode_set ( mode = current_mode )
 		return {'FINISHED'}
 				
+class BlendVertexColorsSoft(bpy.types.Operator):
+	
+	bl_idname = 'opr.blend_vertex_colors_soft'
+	bl_label = 'Blend Vertex Colors (by vertex)'
+	bl_options = {'REGISTER', "UNDO"}
+	
+	@classmethod
+	def description(cls, context, properties):
+		return "Blend vertex colors"
+	
+	
+	def execute(self, context):
+		for object in bpy.context.selected_objects:
+			if object.type == "MESH":
+				if context.mode == 'EDIT_MESH':
+					bpy.ops.object.mode_set(mode='OBJECT')
+					bpy.context.view_layer.objects.active = object
+					mesh = object.data
+					if (len(mesh.color_attributes)==0):
+						mesh.color_attributes.active = mesh.color_attributes.new(name="Col", type='BYTE_COLOR', domain='CORNER')
+					vertex_colors = mesh.color_attributes.active_color
+					
+					
+					selected_verts = []
+					for vert in mesh.vertices:
+						if vert.select == True:
+							selected_verts.append(vert)
+					
+					if vertex_colors.domain == 'CORNER':
+
+						vertex_map = defaultdict(list)    ## store the corners that go wtih each vert
+						polygons = object.data.polygons
+						for poly in polygons:
+							for vert_index, loop_indexes in zip(poly.vertices, poly.loop_indices):
+								vertex_map[vert_index].append(loop_indexes)
+					
+						for vert_index, loop_indexes in vertex_map.items():
+
+							if mesh.vertices[vert_index].select:
+								for loop_index in loop_indexes:
+									if (context.scene.tint_mode == 'MUL'):
+										vertex_colors.data[loop_index].color[0] = ((vertex_colors.data[loop_index].color[0]*context.scene.tint_color[0])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[0]*(1-context.scene.tint_color[3]))
+										vertex_colors.data[loop_index].color[1] = ((vertex_colors.data[loop_index].color[1]*context.scene.tint_color[1])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[1]*(1-context.scene.tint_color[3]))
+										vertex_colors.data[loop_index].color[2] = ((vertex_colors.data[loop_index].color[2]*context.scene.tint_color[2])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3]))
+									elif (context.scene.tint_mode == 'ADD'):
+										vertex_colors.data[loop_index].color[0] = vertex_colors.data[loop_index].color[0]+(context.scene.tint_color[0]*context.scene.tint_color[3])
+										vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]+(context.scene.tint_color[1]*context.scene.tint_color[3])
+										vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]+(context.scene.tint_color[2]*context.scene.tint_color[3])
+									elif (context.scene.tint_mode == 'SUB'):
+										vertex_colors.data[loop_index].color[0] = vertex_colors.data[loop_index].color[0]-(context.scene.tint_color[0]*context.scene.tint_color[3])
+										vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]-(context.scene.tint_color[1]*context.scene.tint_color[3])
+										vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]-(context.scene.tint_color[2]*context.scene.tint_color[3])
+									elif (context.scene.tint_mode == 'OVRL'):
+										if (vertex_colors.data[loop_index].color[0]<.5):
+											vertex_colors.data[loop_index].color[0] = (2*vertex_colors.data[loop_index].color[0]*(context.scene.tint_color[0])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[0])
+										else:
+											vertex_colors.data[loop_index].color[0] = (1-(2*(1-vertex_colors.data[loop_index].color[0])*(1-(context.scene.tint_color[0]))*context.scene.tint_color[3]))+(1-(context.scene.tint_color[3])*vertex_colors.data[loop_index].color[0])
+										if (vertex_colors.data[loop_index].color[1]<.5):
+											vertex_colors.data[loop_index].color[1] = (2*vertex_colors.data[loop_index].color[1]*(context.scene.tint_color[1])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[1])
+										else:
+											vertex_colors.data[loop_index].color[1] = (1-(2*(1-vertex_colors.data[loop_index].color[1])*(1-(context.scene.tint_color[1]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[1])
+										if (vertex_colors.data[loop_index].color[2]<.5):
+											vertex_colors.data[loop_index].color[2] = (2*vertex_colors.data[loop_index].color[2]*(context.scene.tint_color[2])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[2])
+										else:
+											vertex_colors.data[loop_index].color[2] = (1-(2*(1-vertex_colors.data[loop_index].color[2])*(1-(context.scene.tint_color[2]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[2])
+									elif (context.scene.tint_mode == 'MIX'):
+										vertex_colors.data[loop_index].color[0] = (vertex_colors.data[loop_index].color[0]*(1-context.scene.tint_color[3])+context.scene.tint_color[0]*context.scene.tint_color[3])
+										vertex_colors.data[loop_index].color[1] = (vertex_colors.data[loop_index].color[1]*(1-context.scene.tint_color[3])+context.scene.tint_color[1]*context.scene.tint_color[3])
+										vertex_colors.data[loop_index].color[2] = (vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3])+context.scene.tint_color[2]*context.scene.tint_color[3])
+									
+									
+					if vertex_colors.domain == 'POINT':
+						for selected_vert in selected_verts:
+							loop_index = selected_vert.index
+							if (context.scene.tint_mode == 'MUL'):
+								vertex_colors.data[loop_index].color[0] = ((vertex_colors.data[loop_index].color[0]*context.scene.tint_color[0])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[0]*(1-context.scene.tint_color[3]))
+								vertex_colors.data[loop_index].color[1] = ((vertex_colors.data[loop_index].color[1]*context.scene.tint_color[1])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[1]*(1-context.scene.tint_color[3]))
+								vertex_colors.data[loop_index].color[2] = ((vertex_colors.data[loop_index].color[2]*context.scene.tint_color[2])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3]))
+							elif (context.scene.tint_mode == 'ADD'):
+								vertex_colors.data[loop_index].color[0] = vertex_colors.data[loop_index].color[0]+(context.scene.tint_color[0]*context.scene.tint_color[3])
+								vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]+(context.scene.tint_color[1]*context.scene.tint_color[3])
+								vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]+(context.scene.tint_color[2]*context.scene.tint_color[3])
+							elif (context.scene.tint_mode == 'SUB'):
+								vertex_colors.data[loop_index].color[0] = vertex_colors.data[loop_index].color[0]-(context.scene.tint_color[0]*context.scene.tint_color[3])
+								vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]-(context.scene.tint_color[1]*context.scene.tint_color[3])
+								vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]-(context.scene.tint_color[2]*context.scene.tint_color[3])
+							elif (context.scene.tint_mode == 'OVRL'):
+								if (vertex_colors.data[loop_index].color[0]<.5):
+									vertex_colors.data[loop_index].color[0] = (2*vertex_colors.data[loop_index].color[0]*(context.scene.tint_color[0])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[0])
+								else:
+									vertex_colors.data[loop_index].color[0] = (1-(2*(1-vertex_colors.data[loop_index].color[0])*(1-(context.scene.tint_color[0]))*context.scene.tint_color[3]))+(1-(context.scene.tint_color[3])*vertex_colors.data[loop_index].color[0])
+								if (vertex_colors.data[loop_index].color[1]<.5):
+									vertex_colors.data[loop_index].color[1] = (2*vertex_colors.data[loop_index].color[1]*(context.scene.tint_color[1])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[1])
+								else:
+									vertex_colors.data[loop_index].color[1] = (1-(2*(1-vertex_colors.data[loop_index].color[1])*(1-(context.scene.tint_color[1]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[1])
+								if (vertex_colors.data[loop_index].color[2]<.5):
+									vertex_colors.data[loop_index].color[2] = (2*vertex_colors.data[loop_index].color[2]*(context.scene.tint_color[2])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[2])
+								else:
+									vertex_colors.data[loop_index].color[2] = (1-(2*(1-vertex_colors.data[loop_index].color[2])*(1-(context.scene.tint_color[2]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[2])
+							elif (context.scene.tint_mode == 'MIX'):
+								vertex_colors.data[loop_index].color[0] = (vertex_colors.data[loop_index].color[0]*(1-context.scene.tint_color[3])+context.scene.tint_color[0]*context.scene.tint_color[3])
+								vertex_colors.data[loop_index].color[1] = (vertex_colors.data[loop_index].color[1]*(1-context.scene.tint_color[3])+context.scene.tint_color[1]*context.scene.tint_color[3])
+								vertex_colors.data[loop_index].color[2] = (vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3])+context.scene.tint_color[2]*context.scene.tint_color[3])
+					bpy.ops.object.mode_set(mode='EDIT')
+				else:
+					bpy.context.view_layer.objects.active = object
+					current_mode = bpy.context.object.mode
+					bpy.ops.object.mode_set(mode='OBJECT')
+					mesh = object.data
+					if (len(mesh.color_attributes)==0):
+						self.report({"ERROR"}, "One or more selected object has no vertex colors.")
+					else:
+						vertex_colors = mesh.color_attributes.active_color
+							
+						for vert in vertex_colors.data:	 ## store original vert colors
+							if (context.scene.tint_mode == 'MUL'):
+								vert.color[0] = ((vert.color[0]*context.scene.tint_color[0])*context.scene.tint_color[3])+(vert.color[0]*(1-context.scene.tint_color[3]))
+								vert.color[1] = ((vert.color[1]*context.scene.tint_color[1])*context.scene.tint_color[3])+(vert.color[1]*(1-context.scene.tint_color[3]))
+								vert.color[2] = ((vert.color[2]*context.scene.tint_color[2])*context.scene.tint_color[3])+(vert.color[2]*(1-context.scene.tint_color[3]))
+							elif (context.scene.tint_mode == 'ADD'):
+								vert.color[0] = vert.color[0]+(context.scene.tint_color[0]*context.scene.tint_color[3])
+								vert.color[1] = vert.color[1]+(context.scene.tint_color[1]*context.scene.tint_color[3])
+								vert.color[2] = vert.color[2]+(context.scene.tint_color[2]*context.scene.tint_color[3])
+							elif (context.scene.tint_mode == 'SUB'):
+								vert.color[0] = vert.color[0]-(context.scene.tint_color[0]*context.scene.tint_color[3])
+								vert.color[1] = vert.color[1]-(context.scene.tint_color[1]*context.scene.tint_color[3])
+								vert.color[2] = vert.color[2]-(context.scene.tint_color[2]*context.scene.tint_color[3])
+							elif (context.scene.tint_mode == 'OVRL'):
+								if (vert.color[0]<.5):
+									vert.color[0] = (2*vert.color[0]*(context.scene.tint_color[0])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vert.color[0])
+								else:
+									vert.color[0] = (1-(2*(1-vert.color[0])*(1-(context.scene.tint_color[0]))*context.scene.tint_color[3]))+(1-(context.scene.tint_color[3])*vert.color[0])
+								if (vert.color[1]<.5):
+									vert.color[1] = (2*vert.color[1]*(context.scene.tint_color[1])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vert.color[1])
+								else:
+									vert.color[1] = (1-(2*(1-vert.color[1])*(1-(context.scene.tint_color[1]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vert.color[1])
+								if (vert.color[2]<.5):
+									vert.color[2] = (2*vert.color[2]*(context.scene.tint_color[2])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vert.color[2])
+								else:
+									vert.color[2] = (1-(2*(1-vert.color[2])*(1-(context.scene.tint_color[2]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vert.color[2])
+							elif (context.scene.tint_mode == 'MIX'):
+								vert.color[0] = (vert.color[0]*(1-context.scene.tint_color[3])+context.scene.tint_color[0]*context.scene.tint_color[3])
+								vert.color[1] = (vert.color[1]*(1-context.scene.tint_color[3])+context.scene.tint_color[1]*context.scene.tint_color[3])
+								vert.color[2] = (vert.color[2]*(1-context.scene.tint_color[3])+context.scene.tint_color[2]*context.scene.tint_color[3])
+
+					bpy.ops.object.mode_set ( mode = current_mode )
+					
+		return {'FINISHED'}		
+
 class BlendVertexColors(bpy.types.Operator):
 	
 	bl_idname = 'opr.blend_vertex_colors'
-	bl_label = 'Blend Vertex Colors'
+	bl_label = 'Blend Vertex Colors (by face)'
 	bl_options = {'REGISTER', "UNDO"}
 	
 	@classmethod
@@ -690,37 +839,7 @@ class BlendVertexColors(bpy.types.Operator):
 									vertex_colors.data[loop_index].color[2] = (vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3])+context.scene.tint_color[2]*context.scene.tint_color[3])
 									
 					if vertex_colors.domain == 'POINT':
-						for selected_vert in selected_verts:
-							loop_index = selected_vert.index
-							if (context.scene.tint_mode == 'MUL'):
-								vertex_colors.data[loop_index].color[0] = ((vertex_colors.data[loop_index].color[0]*context.scene.tint_color[0])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[0]*(1-context.scene.tint_color[3]))
-								vertex_colors.data[loop_index].color[1] = ((vertex_colors.data[loop_index].color[1]*context.scene.tint_color[1])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[1]*(1-context.scene.tint_color[3]))
-								vertex_colors.data[loop_index].color[2] = ((vertex_colors.data[loop_index].color[2]*context.scene.tint_color[2])*context.scene.tint_color[3])+(vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3]))
-							elif (context.scene.tint_mode == 'ADD'):
-								vertex_colors.data[loop_index].color[0] = vertex_colors.data[loop_index].color[0]+(context.scene.tint_color[0]*context.scene.tint_color[3])
-								vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]+(context.scene.tint_color[1]*context.scene.tint_color[3])
-								vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]+(context.scene.tint_color[2]*context.scene.tint_color[3])
-							elif (context.scene.tint_mode == 'SUB'):
-								vertex_colors.data[loop_index].color[0] = vertex_colors.data[loop_index].color[0]-(context.scene.tint_color[0]*context.scene.tint_color[3])
-								vertex_colors.data[loop_index].color[1] = vertex_colors.data[loop_index].color[1]-(context.scene.tint_color[1]*context.scene.tint_color[3])
-								vertex_colors.data[loop_index].color[2] = vertex_colors.data[loop_index].color[2]-(context.scene.tint_color[2]*context.scene.tint_color[3])
-							elif (context.scene.tint_mode == 'OVRL'):
-								if (vertex_colors.data[loop_index].color[0]<.5):
-									vertex_colors.data[loop_index].color[0] = (2*vertex_colors.data[loop_index].color[0]*(context.scene.tint_color[0])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[0])
-								else:
-									vertex_colors.data[loop_index].color[0] = (1-(2*(1-vertex_colors.data[loop_index].color[0])*(1-(context.scene.tint_color[0]))*context.scene.tint_color[3]))+(1-(context.scene.tint_color[3])*vertex_colors.data[loop_index].color[0])
-								if (vertex_colors.data[loop_index].color[1]<.5):
-									vertex_colors.data[loop_index].color[1] = (2*vertex_colors.data[loop_index].color[1]*(context.scene.tint_color[1])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[1])
-								else:
-									vertex_colors.data[loop_index].color[1] = (1-(2*(1-vertex_colors.data[loop_index].color[1])*(1-(context.scene.tint_color[1]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[1])
-								if (vertex_colors.data[loop_index].color[2]<.5):
-									vertex_colors.data[loop_index].color[2] = (2*vertex_colors.data[loop_index].color[2]*(context.scene.tint_color[2])*context.scene.tint_color[3])+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[2])
-								else:
-									vertex_colors.data[loop_index].color[2] = (1-(2*(1-vertex_colors.data[loop_index].color[2])*(1-(context.scene.tint_color[2]))*context.scene.tint_color[3]))+((1-context.scene.tint_color[3])*vertex_colors.data[loop_index].color[2])
-							elif (context.scene.tint_mode == 'MIX'):
-								vertex_colors.data[loop_index].color[0] = (vertex_colors.data[loop_index].color[0]*(1-context.scene.tint_color[3])+context.scene.tint_color[0]*context.scene.tint_color[3])
-								vertex_colors.data[loop_index].color[1] = (vertex_colors.data[loop_index].color[1]*(1-context.scene.tint_color[3])+context.scene.tint_color[1]*context.scene.tint_color[3])
-								vertex_colors.data[loop_index].color[2] = (vertex_colors.data[loop_index].color[2]*(1-context.scene.tint_color[3])+context.scene.tint_color[2]*context.scene.tint_color[3])
+						self.report({"ERROR"}, "One or more selected object uses per-vertex colors. Convert to face corner and try again.")
 
 					bpy.ops.object.mode_set(mode='EDIT')
 				else:
@@ -766,7 +885,8 @@ class BlendVertexColors(bpy.types.Operator):
 
 					bpy.ops.object.mode_set ( mode = current_mode )
 					
-		return {'FINISHED'}		
+		return {'FINISHED'}	
+
 # == PANELS
 class VertexColorStylizerPanel(bpy.types.Panel):
 	
@@ -827,7 +947,8 @@ class VertexColorStylizerPanel(bpy.types.Panel):
 		row.prop(context.scene, 'replaceA3')
 		row = vis_box4.row()
 		
-		vis_box5.operator('opr.blend_vertex_colors', text='Blend Vertex Colors')
+		vis_box5.operator('opr.blend_vertex_colors', text='Blend Vertex Colors (by face)')
+		vis_box5.operator('opr.blend_vertex_colors_soft', text='Blend Vertex Colors (by vertex)')
 		row = vis_box5.row()
 		row.prop(context.scene, 'tint_color')
 		row.prop(context.scene, 'tint_mode')
@@ -858,6 +979,7 @@ CLASSES = [
 	StylizeVertexColors,
 	InvertVertexColors,
 	BlendVertexColors,
+	BlendVertexColorsSoft,
 	VertexColorStylizerPanel,
 	PanelPreferences
 ]
