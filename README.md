@@ -2,7 +2,8 @@
 Several functions for modifying vertex colors. For Blender 2.3 and later.
 
 ![vertex_color_stylizer_banner](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/2f497ecf-eaf7-4132-a483-4281e72cd23d)
-![vertex_color_stylizer3](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/2b6bce0a-2887-470d-841a-912b07fff35b)
+
+![vertex_color_stylizer](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/bab325c0-fe1a-40fa-adb8-6db10c88efcf)
 
 ## Randomize Vertex Colors (soft)
 Randomizes color per vertex.
