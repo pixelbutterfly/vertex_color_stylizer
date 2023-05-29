@@ -7,32 +7,32 @@ Several functions for modifying vertex colors. For Blender 2.3 and later.
 ## Randomize Vertex Colors (soft)
 Randomizes color per vertex.
 
-![vertex_color_add_soft_noise](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/aca37b55-dab1-45c7-888b-c31703defc0b)
+![vertex_color_randomize_soft](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/c4dc9e59-c553-4253-9427-e559181eaff9)
 
 ## Randomize Vertex Colors (hard)
 Randomizes color per face corner.
 
-![vertex_color_add_hard_noise](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/22fd8573-e5c4-427a-be99-e85596338975)
+![vertex_color_randomize_hard](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/80782ac4-12d0-4d1a-ba06-ee4638f6e0c0)
 
 ## Harden Vertex Colors
 Averages out the vertex colors per face, giving a faceted look to your colors.
 
-![vertex_color_harden](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/48b636ae-df77-4f17-ba59-b8dccaece3d6)
+![vertex_color_harden](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/f224b324-995a-4f8f-8c32-02b9923a1570)
 
 ## Stylize Vertex Colors
 Same as 'Harden Colors' but also randomizes the colors of the faces.
 
-![vertex_color_stylize](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/6d6935e5-f925-4429-bcaf-795e072738a4)
+![vertex_color_stylize](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/62a6dce5-20b9-490f-8a02-0ffbae7eeda6)
 
 ## Invert Vertex Colors
 Similar to Blender's "invert color" function, but lets you mask by channel including the alpha channel.
 
-![vertex_color_stylizer_invert](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/fdb337ef-d9b3-44d3-b8ba-9951bb567ddd)
+![vertex_color_invert](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/9ac8305d-a1af-4587-b602-ca24644d45e4)
 
 ## Blend Vertex Colors
-Add, subtract, multiply, mix, or overlay the selected color over the selected faces.
+Add, subtract, multiply, mix, or overlay the selected color over the selected faces. Different options for working on selected faces and on selected verts (when in edit mode).
 
-![vertex_color_blend](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/27f435da-e476-42e6-b384-42bb25cbcdd5)
+![vertex_color_blend](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/520705c4-9d7f-4992-89f4-28aeda7ec3aa)
 
 ## Notes
 * All functions work in any viewport mode on the selected objects or (in edit mode) on the selected faces. 
