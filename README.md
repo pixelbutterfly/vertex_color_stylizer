@@ -1,5 +1,5 @@
 # Vertex Color Stylizer
-Several functions for modifying vertex colors. For Blender 2.3 and later.
+Several functions for modifying vertex colors. For Blender 3.2 and later.
 
 ![vertex_color_stylizer_banner](https://github.com/pixelbutterfly/vertex_color_stylizer/assets/61604905/2f497ecf-eaf7-4132-a483-4281e72cd23d)
 
